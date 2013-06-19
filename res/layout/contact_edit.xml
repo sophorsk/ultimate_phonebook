@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@android:id/tabhost" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+	<LinearLayout android:orientation="vertical"
+		android:layout_width="fill_parent" android:layout_height="fill_parent">
+		<TabWidget android:id="@android:id/tabs"
+			android:layout_width="fill_parent" android:layout_height="wrap_content" />
+		<FrameLayout android:id="@android:id/tabcontent"
+			android:layout_width="fill_parent" android:layout_height="fill_parent">
+			
+			<!-- First tab contains user's personal info -->
+			<ScrollView android:id="@+id/ScrollView01"
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent">
+			<TableLayout android:id="@+id/layout_tab_one"
+				android:layout_width="match_parent" android:layout_height="match_parent">
+				<TableRow>
+					<TextView android:layout_width="wrap_content"
+						android:layout_height="wrap_content" android:text="@string/full_name" />
+				</TableRow>
+				<TableRow>
+					<EditText android:id="@+id/full_name_et"
+						android:layout_height="wrap_content" android:layout_width="wrap_content"
+						android:layout_weight="1" />
+				</TableRow>
+				
+				<TableRow>
+					<TextView android:layout_width="wrap_content"
+						android:layout_height="wrap_content" android:text="@string/mobile_personal" />
+				</TableRow>
+				<TableRow>
+					<EditText android:id="@+id/mobile_personal_et"
+						android:layout_height="wrap_content" android:layout_width="wrap_content"
+						android:layout_weight="1" />
+				</TableRow>
+				
+				<TableRow>
+					<TextView android:layout_width="wrap_content"
+						android:layout_height="wrap_content" android:text="@string/mobile_work" />
+				</TableRow>
+				<TableRow>
+					<EditText android:id="@+id/mobile_work_et"
+						android:layout_height="wrap_content" android:layout_width="wrap_content"
+						android:layout_weight="1" />
+				</TableRow>
+				
+				<TableRow>
+					<TextView android:layout_width="wrap_content"
+						android:layout_height="wrap_content" android:text="@string/other_home" />
+				</TableRow>
+				<TableRow>
+					<EditText android:id="@+id/other_home_et"
+						android:layout_height="wrap_content" android:layout_width="wrap_content"
+						android:layout_weight="1" />
+				</TableRow>
+				
+				<TableRow>
+					<TextView android:text="@string/group" android:id="@+id/group_tv" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+				</TableRow>
+				
+				<Spinner android:layout_height="wrap_content" android:id="@+id/group_spinner" android:layout_gravity="fill_horizontal" android:layout_width="match_parent" android:prompt="@string/group_name"></Spinner>
+				<Button android:text="@string/save_edit" android:id="@+id/contactEditButton" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+			</TableLayout>
+			</ScrollView>
+			<!-- Second tab contains user's email information -->
+
+			<TableLayout android:id="@+id/layout_tab_two"
+				android:layout_width="match_parent" android:layout_height="match_parent">
+				<TableRow>
+					<TextView android:layout_width="wrap_content"
+						android:layout_height="wrap_content" android:text="@string/first_email" />
+				</TableRow>
+				<TableRow>
+					<EditText android:id="@+id/first_email_et"
+						android:layout_height="wrap_content" android:layout_width="wrap_content"
+						android:layout_weight="1" />
+				</TableRow>
+				
+				<TableRow>
+					<TextView android:text="@string/second_email"
+						android:layout_width="wrap_content" android:layout_height="wrap_content" />
+				</TableRow>
+				<TableRow>
+					<EditText android:id="@+id/second_email_et"
+						android:layout_height="wrap_content" android:layout_width="wrap_content"
+						android:layout_weight="1" />
+				</TableRow>
+				
+				<TableRow>
+					<TextView android:text="@string/third_email"
+						android:layout_width="wrap_content" android:layout_height="wrap_content" />
+				</TableRow>
+				<TableRow>
+					<EditText android:id="@+id/third_email_et"
+						android:layout_height="wrap_content" android:layout_width="wrap_content"
+						android:layout_weight="1" />
+				</TableRow>
+				
+				<TableRow>
+					<TextView android:text="@string/fourth_email"
+						android:layout_width="wrap_content" android:layout_height="wrap_content" />
+				</TableRow>
+				<TableRow>
+					<EditText android:id="@+id/fourth_email_et"
+						android:layout_height="wrap_content" android:layout_width="wrap_content"
+						android:layout_weight="1" />
+				</TableRow>
+				
+				<TableRow>
+				<Button android:text="@string/save_edit" android:id="@+id/contactEditButton1" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+				</TableRow>
+			</TableLayout>
+			
+			<!-- Third tab has user's address -->
+			<ScrollView android:id="@+id/ScrollView03"
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent">
+				
+			<LinearLayout android:layout_height="wrap_content"
+				android:layout_width="match_parent" android:id="@+id/layout_tab_three"
+				android:orientation="vertical">
+				<TextView android:text="@string/first_street"
+					android:layout_height="wrap_content" android:layout_width="match_parent"
+					android:id="@+id/first_street_tv" />
+				
+				<EditText android:id="@+id/first_street_et"
+						android:layout_height="wrap_content" android:layout_width="match_parent"
+						android:layout_weight="1" />
+
+				<TextView android:text="@string/second_street"
+					android:layout_height="wrap_content" android:layout_width="match_parent"
+					android:id="@+id/second_street_tv" />
+					
+				<EditText android:id="@+id/second_street_et"
+						android:layout_height="wrap_content" android:layout_width="match_parent"
+						android:layout_weight="1" />
+					
+
+				<TextView android:text="@string/city"
+					android:layout_height="wrap_content" android:layout_width="match_parent"
+					android:id="@+id/city_tv" />
+					
+				<EditText android:id="@+id/city_et"
+						android:layout_height="wrap_content" android:layout_width="match_parent"
+						android:layout_weight="1" />
+
+
+				<TextView android:text="@string/state"
+					android:layout_height="wrap_content" android:layout_width="match_parent"
+					android:id="@+id/state_tv" />
+					
+				<EditText android:id="@+id/state_et"
+						android:layout_height="wrap_content" android:layout_width="match_parent"
+						android:layout_weight="1" />
+
+				<TextView android:text="@string/country"
+					android:layout_height="wrap_content" android:layout_width="match_parent"
+					android:id="@+id/country_tv" />
+				
+				<EditText android:id="@+id/country_et"
+						android:layout_height="wrap_content" android:layout_width="match_parent"
+						android:layout_weight="1" />
+
+				<TextView android:text="@string/zip"
+					android:layout_height="wrap_content" android:layout_width="match_parent"
+					android:id="@+id/zip_tv" />
+				
+				<EditText android:id="@+id/zip_et"
+						android:layout_height="wrap_content" android:layout_width="match_parent"
+						android:layout_weight="1" />
+				
+				<Button android:text="@string/save_edit" android:id="@+id/contactEditButton2" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+
+			</LinearLayout>
+			</ScrollView>
+			<!-- Fourth Tab for social networking sites -->
+			
+			<TableLayout android:id="@+id/layout_tab_four"
+				android:layout_width="match_parent" android:layout_height="match_parent">
+				<TableRow>
+					<TextView android:layout_width="wrap_content"
+						android:layout_height="wrap_content" android:text="@string/facebookId" />
+				</TableRow>
+				<TableRow>
+					<EditText android:id="@+id/facebookID"
+						android:layout_height="wrap_content" android:layout_width="wrap_content"
+						android:layout_weight="1" />
+				</TableRow>		
+				
+				<TableRow>
+					<TextView android:layout_width="wrap_content"
+						android:layout_height="wrap_content" android:text="@string/twitter_username" />
+				</TableRow>
+				<TableRow>
+					<EditText android:id="@+id/twitterUsername"
+						android:layout_height="wrap_content" android:layout_width="wrap_content"
+						android:layout_weight="1" />
+				</TableRow>	
+				
+				<TableRow>
+				<Button android:text="@string/save_edit" android:id="@+id/contactEditButton3" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+				</TableRow>	
+	
+			</TableLayout>
+
+		</FrameLayout>
+	</LinearLayout>
+
+
+</TabHost>

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, UltimatePhoneBookv2!</string>
+    <string name="contact_pane">ContactPane</string>
+    <string name="app_name">Ultimate PhoneBook v2</string>
+    
+    
+    <!-- Email Information  -->
+    <string name="first_email">Email 1</string>
+    <string name="second_email">Email 2</string>
+    <string name="third_email">Email 3</string>
+    <string name="fourth_email">Email 4</string>
+    <string name="email_subject"> Subject </string>
+    <string name="email_send_to"> To: </string>
+    <string name="add_email_send"> Add </string>
+    <string name="send_mail"> Send Email </string>
+    <string name="discard_mail"> Discard </string>
+    <string name="email_to"></string>
+    
+    
+    <!-- Address Information -->
+    <string name="first_street">First Street</string>
+    <string name="second_street">Second Street</string>
+    <string name="city">City</string>
+    <string name="state">State</string>
+    <string name="country">Country</string>
+    <string name="zip">Zip Code</string>
+    
+    
+    <!-- Personal Information -->
+    <string name="full_name">Full Name</string>
+    
+    
+    <!-- Phone Information -->
+    <string name="mobile_personal">Personal Mobile</string>
+    <string name="mobile_work">Work Mobile</string>
+    <string name="other_home">Home</string>
+    
+    
+    <!-- Group Information -->
+    <string name="group">Group</string>
+    <string name="group_name">Select Group</string>
+    <string-array name="group_name_array">
+    	<item>Family</item>
+    	<item>Close Friends</item>
+    	<item>New Group</item>
+    </string-array>
+    
+    
+    <!-- App Components (Buttons and such) -->
+    <string name="call">Call</string>
+    <string name="facebook">Facebook</string>
+    <string name="text">Text</string>
+    <string name="twitter">Twitter</string>
+    <string name="directions">Directions</string>
+    <string name="googlePlus">Google+</string>
+    <string name="edit">ContactEditor</string>
+    <string name="justdelete">Delete</string>
+    <string name="message">Message</string>
+    <string name="save_new">Save</string>
+    <string name="dialer">Phone Dialer</string>
+    <string name="add_contact">Add Contact</string>
+    <string name="save_edit">Save Changes</string>
+    <string name="order_contacts">OrderContacts</string>
+    <string name="edit_button">Edit</string>
+    <string name="email"> Email </string>
+    <string name="back"> Back </string>
+    
+ 
+   
+    <!-- Labels -->
+    <string name="contactEmailLabel">Email</string>
+    <string name="contactPhoneLabel">Phone</string>
+    <string name="firstNameLabel">First Name</string>
+    <string name="lastNameLabel">Last Name</string>
+    <string name="groupLabel">Group</string>
+    <string name="targetAccountLabel">Target Account</string>
+    
+    
+    <!-- Deleting contact options -->
+    <string name="deleteOption">Are you sure you want to delete this contact?</string>
+    <string name="delete_option"> Are You Sure ?</string>
+    <string name="delete_no"> No </string>
+    <string name="delete_yes"> Yes </string>
+    
+    
+    <string name="order_type">Choose Order type</string>
+    <string-array name="order_type_array">
+    	<item>Alphabetical</item>
+    	<item>Frequent</item>
+    	<item>Recent</item>
+    	<item>Groups</item>
+    </string-array>
+    
+    
+    <!-- Facebook information -->
+    <string name="add_facebook"> Add Account </string>
+    <string name="use_facebook"> Use Account </string>
+    <string name="cancel_facebook"> Cancel </string>
+    <string name="welcome_facebook"> Welcome to Facebook </string>
+    <string name="username_facebook"> User Name</string>
+    
+    
+    <!-- Map Information -->
+    <string name="gpsdirections">Get Directions From Current Location</string>
+    <string name="getdirections">Get Directions There From:</string>
+    <string name="viewonmap">View on Map</string>
+    <string name="addaddress">Add New Address</string>
+    
+    <!--  Twitter -->
+    
+    <string name ="tweetreader"> View Tweets</string> 
+    <string name ="twitterstatus">Tweet @ Contact</string>
+    <string name ="twitteradd"> Add/Edit Account</string>
+    
+    <string name="add_twitter"> Cancel </string>
+    <string name="update_twitter"> Tweet @ Contact </string>
+    <string name="view_twitter"> View Tweets</string>
+    <string name="welcome_twitter"> Welcome to Twitter </string>
+    <string name="twitter_username"> Twitter Username </string>
+    
+    <string name="tweet_at">...will be automatically tagged in your tweet</string>
+    
+	<!--     Facebook for test -->
+	
+	<string name="app_name1">Facebook for Ultimate Phonebook</string>
+    <!-- <string name="request">Request!</string> -->
+    <string name="post">Wall Post!</string>
+    <string name="delete">Delete Post</string>
+	<!-- <string name="no_login">Graph API Explorer</string> -->
+	<string name="get_permissions">Get Permissions</string>
+	<!-- <string name="access_token">Access Token:</string> -->
+	<!-- <string name="graph_domain">https://graph.facebook.com/</string> -->
+	<!-- <string name="submit">Submit</string> -->
+	<!-- <string name="label_output">Output:</string> -->
+	<!-- <string name="show_metadata">Show metadata</string> -->
+	<string name="view_url">URL</string>
+	<string name="target_url">Target URL:</string>
+	<string name="exception">Exception: </string>
+	<string name="tip_label">Tip:</string>
+	<string name="facebook_error">Facebook Error: </string>
+	<string name="api_response">Api Response:</string>
+	<string name="view_source">View Source</string>
+	<string name="view_post">View Post</string>
+	<string name="delete_post">Delete Post</string>
+	<!-- <string name="source_code">Source Code:</string> -->
+	<string name="please_wait">Please wait...</string>
+	<!-- <string name="graph_button">Graph API</string>
+	<string name="fql_button">FQL Query</string>
+	<string name="source_tag">Source tag:</string> -->
+	<string name="permission_source_tag">Source tag: \"perms_tag\"</string>
+	<!-- <string name="Graph_FQL_title">Graph API or FQL Query?</string>
+	<string name="Graph_FQL_msg">Get friends using Graph or FQL Query?\n\nWith FQL query you can sort the list by names, whereas with Graph list will be ordered by UID and can\'t be changed.</string> -->
+	<string name="can_post_on_wall_title">Post on friend\'s wall</string>
+	<string name="can_post_on_wall">Friends list fetched. You can post on friend\'s wall by clicking on the item.</string>
+	<string name="ok">OK</string>
+	<string name="post_on_wall_title">Post on Wall?</string>
+	<string name="post_on_wall">Would you like to post on %1$s\'s wall?</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+	<string name="save">Save</string>
+	<string name="reset">Reset</string>
+	<!-- <string  name="get_fields">Get Fields</string>
+	<string name="fields">Fields</string> -->
+	<string name="connections">Connections</string>
+	<string name="cancel">Cancel</string>
+	<string name="user">User Data</string>
+	<string name="friend">Friends Data</string>
+	<string name="extended">Extended</string>
+	<string name="remote_button">Remote</string>
+	<string name="fetching_current_permissions">Fetching current permissions...</string>
+	<string name="explorer_message">Also, checkout the web-version of the <a href="http://developers.facebook.com/tools/explorer">Graph API Explorer tool</a></string>
+	<string name="permissions">Permissions</string>
+	<string name="back_parent">Back to parent</string>
+	<string name="fields_and_connections">Fields \u0026 Connections</string>
+	<string name="permissions_request">Select Permissions:</string>
+	<string name="permission_detail">Checkout <a href="https://developers.facebook.com/docs/authentication/permissions/">permissions reference doc</a></string>
+	<string name="post_tip">\'read_stream\' permission is required to view and delete the post.\n\nUse SDK dialogs to publish stories or post on friends wall. <a href="https://developers.facebook.com/docs/reference/dialogs">More info</a>\n\n<a href="https://developers.facebook.com/docs/reference/api/Comment">Like and Comment on a post</a></string>
+	
+	<string name="facebookId">Facebook Id</string>
+
+</resources>

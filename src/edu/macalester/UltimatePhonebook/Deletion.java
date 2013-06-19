@@ -1,0 +1,78 @@
+package edu.macalester.UltimatePhonebook;
+
+import edu.macalester.database.DbHelper;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+
+/**
+ * Gives the user the option to delete a contact. This activity
+ * does not delete the contact, it just marks it to be deleted and
+ * the contact is deleted once the activity gets back to the contact list
+ * 
+ * @author The Other Guys
+ *
+ */
+public class Deletion extends Activity{
+	
+	DbHelper adapter;
+	
+	Button deleteYes;
+	Button deleteNo;
+	
+	Bundle bundle;
+	String number;
+	DbHelper helper;
+	Button save;
+	Long id;
+	
+	/**
+	 * Created when the activity starts
+	 */
+	@Override
+	public void onCreate(Bundle bundle) {
+		this.bundle = bundle;
+		super.onCreate(bundle);
+		setContentView(R.layout.deletion);
+		
+		deleteYes = (Button) findViewById(R.id.deleteYes);
+		deleteNo = (Button) findViewById(R.id.deleteNo);
+		
+		Bundle extras = getIntent().getExtras();
+		
+		id = null;
+		id = (bundle == null) ? null : (Long) bundle
+				.getSerializable(DbHelper.KEY_ROWID);
+		
+
+		if (extras != null) {
+			id = extras.getLong(DbHelper.KEY_ROWID);
+		}
+		
+		deleteYes.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent markIntent = new Intent();
+				markIntent.setClass(Deletion.this, ContactPane.class);
+				markIntent.putExtra(DbHelper.KEY_ROWID, id);
+				if (getParent() == null) {
+				    setResult(Activity.RESULT_OK, markIntent);
+				} else {
+				    getParent().setResult(Activity.RESULT_OK, markIntent);
+				}
+				finish();
+			}
+		});
+		
+		deleteNo.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
+	}
+}

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="1">
+
+	
+	    
+	<TextView android:layout_width="wrap_content" 
+	         android:textAppearance="?android:attr/textAppearanceMedium" 
+	         android:layout_gravity="center" 
+	         android:layout_height="40dp" 
+	         android:id="@+id/tweet_at" 
+	         android:text="@string/tweet_at" android:layout_weight="0.05"></TextView>
+	         
+	<EditText
+		android:id="@+id/TwitterMessageText"
+		android:layout_margin="12dip"
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:hint="Type your tweet here"></EditText>
+
+	    <Button android:id="@+id/btn_tweet"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="Tweet"
+	            android:layout_gravity="center" />
+	            
+	    <Button android:id="@+id/btn_cancel_twitter_status"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="Back to Twitter Menu"
+	            android:layout_gravity="center" />	                
+	                    
+	            
+	    <TextView android:id="@+id/login_info"
+	             android:layout_width="wrap_content"
+	             android:layout_height="wrap_content"
+	             android:text="If you have not yet logged in, you will be asked to do so when you first tweet. You can log out at any time by hitting the 'Clear Credentials' button below."
+	    		android:textColor="#FFFFFF"/>        
+	    
+	    
+	        
+	    <Button android:id="@+id/btn_clear_credentials"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="Clear Credentials"
+	            android:layout_gravity="center" />	 
+	            
+	      <TextView android:id="@+id/login_status"
+	             android:layout_width="wrap_content"
+	             android:layout_height="wrap_content"
+	             android:text=""
+	    		android:textColor="#FFFFFF"/>          
+	                    
+	    
+	            
+</LinearLayout>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="1">
+    <LinearLayout android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/linearLayout2">
+        <TextView android:layout_height="wrap_content" android:id="@+id/textView1" android:layout_width="wrap_content" android:text="@string/email_to"></TextView>
+        <Spinner android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="wrap_content" android:id="@+id/email_selector"></Spinner>
+    </LinearLayout>
+    <LinearLayout android:layout_height="wrap_content" android:id="@+id/linearLayout3" android:layout_width="match_parent">
+        <EditText android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="0.80" android:text="@string/email_send_to" android:id="@+id/emailTo">
+            <requestFocus></requestFocus>
+        </EditText>
+        <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="@string/add_email_send" android:id="@+id/addEmail"></Button>
+    </LinearLayout>
+    <EditText android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/email_subject" android:text="@string/email_subject"></EditText>
+    <EditText android:layout_height="wrap_content" android:layout_width="match_parent" android:inputType="textEmailAddress" android:id="@+id/email_body" android:layout_weight="1.14"></EditText>
+    <LinearLayout android:layout_height="wrap_content" android:id="@+id/linearLayout1" android:layout_width="match_parent" android:weightSum="1" android:layout_gravity="center_horizontal">
+        <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/email_send" android:text="@string/send_mail" android:layout_weight="0.59"></Button>
+        <Button android:layout_height="wrap_content" android:layout_width="134dp" android:id="@+id/email_discard" android:text="@string/discard_mail" android:layout_weight="0.36"></Button>
+    </LinearLayout>    
+</LinearLayout>

@@ -1,0 +1,478 @@
+package edu.macalester.facebook;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.ListView;
+import android.widget.AdapterView;
+import android.widget.Toast;
+
+import com.facebook.android.AsyncFacebookRunner;
+import com.facebook.android.Facebook;
+import com.facebook.android.FacebookError;
+import com.facebook.android.Util;
+
+import edu.macalester.UltimatePhonebook.Code;
+import edu.macalester.UltimatePhonebook.ContactEditor;
+import edu.macalester.UltimatePhonebook.R;
+import edu.macalester.database.DbHelper;
+import edu.macalester.facebook.SessionEvents.AuthListener;
+import edu.macalester.facebook.SessionEvents.LogoutListener;
+
+import android.widget.AdapterView.OnItemClickListener;
+
+public class FacebookHelper extends Activity  implements OnItemClickListener {
+
+	// Ultimate phonebook APP ID on facebook
+	public static final String APP_ID = "227284000674956";
+
+	// private instance variables
+	private LoginButton mLoginButton;
+	private TextView mText;
+	private ImageView mUserPic;
+	private Handler mHandler;
+	ProgressDialog dialog;
+
+	final int AUTHORIZE_ACTIVITY_RESULT_CODE = 0;
+
+	private ListView list;
+	String[] main_items = {"Update Status", "Post To Friend's Wall", "Cancel"};
+	String[] permissions = {"offline_access", "publish_stream", "user_photos", "sms", "read_mailbox"};
+
+	Bundle bundle;
+	Long rowId;
+	String facebookName;
+	DbHelper helper;
+	Cursor contact_cursor;
+	Cursor name_cursor;
+	String facebookId;
+
+
+
+	String url;
+	
+	
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		this.bundle = savedInstanceState;
+		super.onCreate(bundle);
+
+		if (APP_ID == null) {
+			Util.showAlert(this, "Warning", "Facebook Applicaton ID must be " +
+					"specified before running this example: see FbAPIs.java");
+			return;
+		}
+
+		setContentView(R.layout.use_facebook);
+		mHandler = new Handler();
+
+		helper = new DbHelper(this);
+
+		mText = (TextView) FacebookHelper.this.findViewById(R.id.txt);
+		mUserPic = (ImageView)FacebookHelper.this.findViewById(R.id.user_pic);
+
+		//Create the Facebook Object using the app id.
+		Utility.mFacebook = new Facebook(APP_ID);
+		//Instantiate the asynrunner object for asynchronous api calls.
+		Utility.mAsyncRunner = new AsyncFacebookRunner(Utility.mFacebook);
+
+		mLoginButton = (LoginButton) findViewById(R.id.login);
+
+		//restore session if one exists
+		SessionStore.restore(Utility.mFacebook, this);
+		SessionEvents.addAuthListener(new FbAPIsAuthListener());
+		SessionEvents.addLogoutListener(new FbAPIsLogoutListener());
+
+		/*
+		 * Source Tag: login_tag
+		 */
+		mLoginButton.init(this, AUTHORIZE_ACTIVITY_RESULT_CODE, Utility.mFacebook, permissions);
+
+		if(Utility.mFacebook.isSessionValid()) {
+			requestUserData();
+		}
+
+		list = (ListView)findViewById(R.id.main_list);
+
+		list.setOnItemClickListener(this);
+		list.setAdapter(new ArrayAdapter<String>(this, R.layout.main_list_item, main_items));
+
+		
+		// Database 
+
+		Bundle extras = getIntent().getExtras();
+		rowId = null;
+		rowId = (bundle == null) ? null : (Long) bundle
+				.getSerializable(DbHelper.KEY_ROWID);
+
+		if (extras != null) {
+			rowId = extras.getLong(DbHelper.KEY_ROWID);			
+		}
+
+		contact_cursor = helper.getFacebookInfo(rowId);
+
+		//Toast.makeText(getBaseContext(), "" + contact_cursor.getCount(), Toast.LENGTH_SHORT).show();
+		facebookId = contact_cursor.getString(contact_cursor.getColumnIndex(DbHelper.KEY_FACEBOOKID));
+		//Toast.makeText(getBaseContext(), "" + facebookId, Toast.LENGTH_SHORT).show();
+		/*if (facebookId.equals("")) {
+			askForAccount();
+		}*/
+
+		name_cursor = helper.getNameInfor(rowId);
+		facebookName = name_cursor.getString(name_cursor.getColumnIndex(DbHelper.KEY_NAME));
+		
+		if (facebookId.equals("")) {
+			askForAccount();
+		}
+	}
+	/**
+	 * If user is logged out, then say logged out, and set image to null
+	 */
+	@Override
+	public void onResume() {
+		super.onResume();
+		if(Utility.mFacebook != null && !Utility.mFacebook.isSessionValid()) {
+			mText.setText("You are logged out! ");
+			mUserPic.setImageBitmap(null);
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		switch(requestCode) {
+		/*
+		 * if this is the activity result from authorization flow, do a call back to authorizeCallback
+		 * Source Tag: login_tag
+		 */
+		case AUTHORIZE_ACTIVITY_RESULT_CODE: {
+			Utility.mFacebook.authorizeCallback(requestCode, resultCode, data);
+			break;
+		}
+		}
+	}
+
+	/**
+	 * Cases if user click on the items
+	 * case 0: update status
+	 * case 1: post on friend's wall
+	 * case 2: send message
+	 * case 3: cancel
+	 */
+	@Override
+	public void onItemClick(AdapterView<?> arg0, View v, int position, long arg3) {
+		switch(position) {
+		/*
+		 * Source Tag: update_status_tag
+		 * Update user's status by invoking the feed dialog
+		 * To post to a friend's wall, provide his uid in the 'to' parameter
+		 * Refer to https://developers.facebook.com/docs/reference/dialogs/feed/ for more info.
+		 */
+		case 0: {
+			if(!Utility.mFacebook.isSessionValid()) {
+				Util.showAlert(this, "Warning", "You must first log in.");
+			} else {
+				Bundle params = new Bundle();
+				params.putString("caption", getString(R.string.app_name1));
+				params.putString("picture", Utility.HACK_ICON_URL);
+
+				Utility.mFacebook.dialog(FacebookHelper.this, "feed", params, new UpdateStatusListener());
+				String access_token = Utility.mFacebook.getAccessToken();
+				System.out.println(access_token);
+
+			}
+			break;
+		}
+
+		case 1: {
+
+			if(!Utility.mFacebook.isSessionValid()) {
+				Util.showAlert(this, "Warning", "You must first log in.");
+			}
+			else {
+				new AlertDialog.Builder(this)
+				.setTitle(R.string.post_on_wall_title)
+				.setMessage(String.format(getString(R.string.post_on_wall), facebookName))
+				.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Bundle params = new Bundle();
+						/*
+						 * Source Tag: friend_wall_tag
+						 * To write on a friend's wall, provide friend's UID in the 'to' parameter.
+						 * More info on feed dialog - https://developers.facebook.com/docs/reference/dialogs/feed/
+						 */
+						params.putString("to", String.valueOf(facebookId));
+						params.putString("caption", getString(R.string.app_name1));
+						params.putString("picture", Utility.HACK_ICON_URL);
+						Utility.mFacebook.dialog(FacebookHelper.this, "feed", params, new PostDialogListener());
+
+					}
+
+				})
+				.setNegativeButton(R.string.no, null)
+				.show();
+			}
+			break;
+
+		}
+		case 2: {
+			finish();
+		}
+		}
+	}
+
+	/*
+	 * callback for the feed dialog which updates the profile status
+	 */
+	public class UpdateStatusListener extends BaseDialogListener {
+		@Override
+		public void onComplete(Bundle values) {
+			final String postId = values.getString("post_id");
+			if (postId != null) {
+				new UpdateStatusResultDialog(FacebookHelper.this, "Update Status executed", values).show();
+			} else {
+				Toast toast = Toast.makeText(getApplicationContext(), "No wall post made", Toast.LENGTH_SHORT);
+				toast.show();
+			}
+		}
+
+		@Override
+		public void onFacebookError(FacebookError error) {
+			Toast.makeText(getApplicationContext(), "Facebook Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+		}
+
+		@Override
+		public void onCancel() {
+			Toast toast = Toast.makeText(getApplicationContext(), "Update status cancelled", Toast.LENGTH_SHORT);
+			toast.show();
+		}
+	}
+
+	public class FQLRequestListener extends BaseRequestListener {
+
+		@Override
+		public void onComplete(final String response, final Object state) {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					Toast.makeText(getApplicationContext(), "Response: " + response, Toast.LENGTH_LONG).show();
+				}
+			});
+		}
+
+		public void onFacebookError(FacebookError error) {
+			Toast.makeText(getApplicationContext(), "Facebook Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+		}
+	}
+
+	/*
+	 * Callback for fetching current user's name, picture, uid.
+	 */
+	public class UserRequestListener extends BaseRequestListener {
+
+		@Override
+		public void onComplete(final String response, final Object state) {
+			JSONObject jsonObject;
+			try {
+				jsonObject = new JSONObject(response);
+
+				final String picURL = jsonObject.getString("picture");
+				final String name = jsonObject.getString("name");
+				Utility.userUID = jsonObject.getString("id");
+
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						mText.setText("Welcome " + name + "!");
+						mUserPic.setImageBitmap(Utility.getBitmap(picURL));
+					}
+				});
+
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	/*
+	 * The Callback for notifying the application when authorization
+	 *  succeeds or fails.
+	 */
+
+	public class FbAPIsAuthListener implements AuthListener {
+
+		@Override
+		public void onAuthSucceed() {
+			requestUserData();
+		}
+
+		@Override
+		public void onAuthFail(String error) {
+			mText.setText("Login Failed: " + error);
+		}
+	}
+
+	/*
+	 * The Callback for notifying the application when log out
+	 *  starts and finishes.
+	 */
+	public class FbAPIsLogoutListener implements LogoutListener {
+		@Override
+		public void onLogoutBegin() {
+			mText.setText("Logging out...");
+		}
+
+		@Override
+		public void onLogoutFinish() {
+			mText.setText("You have logged out! ");
+			mUserPic.setImageBitmap(null);
+		}
+	}
+
+	/*
+	 * Request user name, and picture to show on the main screen.
+	 */
+	public void requestUserData() {
+		mText.setText("Fetching user name, profile pic...");
+		Bundle params = new Bundle();
+		params.putString("fields", "name, picture");
+		Utility.mAsyncRunner.request("me", params, new UserRequestListener());
+	}
+
+
+	/**
+	 * Definition of the list adapter
+	 */
+	public class MainListAdapter extends BaseAdapter {
+		private LayoutInflater mInflater;
+
+		public MainListAdapter() {
+			mInflater = LayoutInflater.from(FacebookHelper.this.getBaseContext());
+		}
+
+		@Override
+		public int getCount() {
+			return main_items.length;
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+
+			View hView = convertView;
+			if(convertView == null) {
+				hView = mInflater.inflate(R.layout.main_list_item, null);
+				ViewHolder holder = new ViewHolder();
+				holder.main_list_item = (TextView) hView.findViewById(R.id.main_api_item);
+				hView.setTag(holder);
+			}
+
+			ViewHolder holder = (ViewHolder) hView.getTag();
+
+			holder.main_list_item.setText(main_items[position]);
+
+			return hView;
+		}	
+
+	}
+
+	class ViewHolder {
+		TextView main_list_item;
+	}
+
+	/**
+	 * Just to tell if the message is posted on wall or not
+	 * @author sophorskhut
+	 *
+	 */
+	public class PostDialogListener extends BaseDialogListener {
+		@Override
+		public void onComplete(Bundle values) {
+			final String postId = values.getString("post_id");     
+			if (postId != null) {                                                                                   
+				showToast("Message posted on the wall.");            
+			} else {                                                                                                
+				showToast("No message posted on the wall.");                                                                       
+			}   
+		}
+	};
+
+	public class SendDialogListener extends BaseDialogListener {
+		@Override
+		public void onComplete(Bundle values) {
+			final String postId = values.getString("post_id");     
+			if (postId != null) {                                                                                   
+				showToast("Message sent.");            
+			} else {                                                                                                
+				showToast("No message sent.");                                                                       
+			}   
+		}
+	};
+	
+	/**
+	 * Show status on screen
+	 * @param msg
+	 */
+	public void showToast(final String msg) {
+		mHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				Toast toast = Toast.makeText(FacebookHelper.this, msg, Toast.LENGTH_LONG);
+				toast.show();
+			}
+		});
+	}
+
+	private void askForAccount() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("This contact has no Facebook account. " +
+				"Would you like to add one?");
+
+		builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				Intent add_facebook = new Intent();
+				add_facebook.setClass(FacebookHelper.this, ContactEditor.class);
+				add_facebook.putExtra(DbHelper.KEY_ROWID, rowId);
+				add_facebook.putExtra(Code.REQUEST_CODE, Code.ADD_FACEBOOK);
+				startActivityForResult(add_facebook, Code.ADD_FACEBOOK);
+			}
+		}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.cancel();
+				finish();
+			}
+		});
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+}

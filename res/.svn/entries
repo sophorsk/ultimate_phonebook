@@ -1,0 +1,49 @@
+10
+
+dir
+552
+http://poliwiki.macalester.edu/svn/comp225f11/otherguys/UltimatePhonebookv2/res
+http://poliwiki.macalester.edu/svn/comp225f11
+
+
+
+2011-12-17T18:27:44.155095Z
+544
+skhut
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+4ffd18b5-4bb7-4192-9107-fc72f938be68
+
+drawable
+dir
+
+drawable-hdpi
+dir
+
+drawable-ldpi
+dir
+
+drawable-mdpi
+dir
+
+layout
+dir
+
+layout-land
+dir
+
+values
+dir
+

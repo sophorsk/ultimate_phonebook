@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="edu.macalester.UltimatePhonebook"
+      android:versionCode="1"
+      android:versionName="1.0">
+    <uses-sdk android:minSdkVersion="10" />
+    <uses-permission android:name="android.permission.INTERNET" /> 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> 
+    <uses-permission android:name="android.permission.CALL_PHONE" /> 
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.WRITE_SMS"/>
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-feature android:name="android.hardware.telephony"
+				android:required="false" />
+
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+        <activity android:name=".UltimatePhonebook"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            
+        </activity>
+        
+        <!-- <receiver android:name=".SmsReceiver"> 
+            <intent-filter> 
+                <action android:name=
+                    "android.provider.Telephony.SMS_RECEIVED" /> 
+            </intent-filter> 
+        </receiver> -->
+        
+        <activity android:name=".ContactPane" 
+        	android:label="@string/contact_pane" /> 
+        	
+        <activity android:name=".Call" 
+        	android:label="@string/call" />
+    
+        <activity android:name=".TextMessage" 
+        	android:label="@string/message" />
+        
+        <activity android:name=".ContactAdder"
+        	android:label="@string/add_contact" />
+        	
+        <activity android:name=".ContactEditor"
+        	android:label="@string/edit" />
+        	
+        <activity android:name=".Deletion"
+        	android:label="@string/delete"/>	
+        	
+        <activity android:name="edu.macalester.map.Directions"
+        	android:label="@string/directions" />  
+        	
+        <activity android:name="edu.macalester.twitter.Twitter"
+        	android:label="@string/twitter" />		
+        
+        <activity android:name="edu.macalester.twitter.TweetReader"
+        	android:label="@string/tweetreader" />
+        	
+        <activity android:name="edu.macalester.twitter.TwitterStatus"
+                  android:label="@string/twitterstatus">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        	
+        <activity android:name="edu.macalester.twitter.TwitterAdd"
+        	android:label="@string/twitteradd" />
+        	
+			
+		<activity android:name="edu.macalester.twitter.PrepareRequestTokenActivity" android:launchMode="singleTask">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="x-oauthflow-twitter" android:host="callback" />
+			</intent-filter>
+		</activity>	
+        	
+        <activity android:name="edu.macalester.facebook.FacebookHelper" 
+		    android:label="@string/app_name1"
+		    android:configChanges="keyboardHidden">
+		</activity>
+		
+		<activity android:name=".EmailSender"
+			android:label="@string/email" />
+        
+    </application>
+</manifest>

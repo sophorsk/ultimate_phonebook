@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+    <RelativeLayout android:layout_width="match_parent" android:id="@+id/relativeLayout1" android:layout_height="match_parent">
+        <ImageView android:layout_marginTop="16dp" android:id="@+id/picture" android:layout_alignParentTop="true" android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:layout_width="wrap_content" android:src="@drawable/place_holder" android:layout_marginLeft="40dp"></ImageView>
+        <TextView android:layout_marginTop="30dp" android:layout_alignLeft="@+id/picture" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="wrap_content" android:text="TextView" android:layout_height="wrap_content" android:id="@+id/name" android:layout_below="@+id/picture"></TextView>
+        <ImageButton android:id="@+id/call" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/call" android:layout_alignParentTop="true" android:layout_toRightOf="@+id/picture" android:layout_marginLeft="60dp"></ImageButton>
+        <ImageButton android:id="@+id/text" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/text" android:layout_alignParentTop="true" android:layout_toRightOf="@+id/call" android:layout_marginLeft="30dp"></ImageButton>
+        <ImageButton android:id="@+id/facebook" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/facebook" android:layout_alignParentTop="true" android:layout_toRightOf="@+id/text" android:layout_marginLeft="30dp"></ImageButton>
+        <ImageButton android:id="@+id/email" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/email" android:layout_below="@+id/call" android:layout_alignRight="@+id/call" android:layout_marginTop="23dp"></ImageButton>
+        <ImageButton android:id="@+id/twitter" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/twitter" android:layout_below="@+id/text" android:layout_alignRight="@+id/text" android:layout_marginTop="23dp"></ImageButton>
+        <ImageButton android:id="@+id/map" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/map" android:layout_below="@+id/facebook" android:layout_alignRight="@+id/facebook" android:layout_marginTop="23dp"></ImageButton>\
+        <ImageButton android:id="@+id/edit" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/edit" android:layout_below="@+id/email" android:layout_alignRight="@+id/email" android:layout_marginTop="23dp"></ImageButton>
+        <ImageButton android:id="@+id/delete" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/delete" android:layout_below="@+id/twitter" android:layout_alignRight="@+id/twitter" android:layout_marginTop="23dp"></ImageButton>
+        <ImageButton android:id="@+id/exit" android:layout_height="wrap_content" android:layout_width="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/exit" android:layout_below="@+id/map" android:layout_alignRight="@+id/map" android:layout_marginTop="23dp" ></ImageButton>
+       
+        <TextView android:text="@string/call" android:layout_below="@+id/call" android:layout_alignLeft="@+id/call" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content"></TextView>
+        <TextView android:text="@string/text" android:layout_below="@+id/text" android:layout_alignLeft="@+id/text" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content"></TextView>
+        <TextView android:text="@string/facebook" android:layout_below="@+id/facebook" android:layout_alignLeft="@+id/facebook" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content"></TextView>
+        <TextView android:text="@string/email" android:layout_below="@+id/email" android:layout_alignLeft="@+id/email" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content"></TextView>
+        <TextView android:text="@string/twitter" android:layout_below="@+id/twitter" android:layout_alignLeft="@+id/twitter" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content"></TextView>
+        <TextView android:text="@string/directions" android:layout_below="@+id/map" android:layout_alignLeft="@+id/map" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content"></TextView>
+        <TextView android:text="@string/edit_button" android:layout_below="@+id/edit" android:layout_alignLeft="@+id/edit" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content"></TextView>
+        <TextView android:text="@string/justdelete" android:layout_below="@+id/delete" android:layout_alignLeft="@+id/delete" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content"></TextView>
+        <TextView android:text="@string/back" android:layout_below="@+id/exit" android:layout_alignLeft="@+id/exit" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content"></TextView>
+    </RelativeLayout>
+    
+</LinearLayout>

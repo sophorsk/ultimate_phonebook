@@ -1,0 +1,43 @@
+10
+
+dir
+552
+http://poliwiki.macalester.edu/svn/comp225f11/otherguys/UltimatePhonebookv2/src/edu/macalester
+http://poliwiki.macalester.edu/svn/comp225f11
+
+
+
+2011-12-19T11:54:02.697678Z
+552
+skhut
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+4ffd18b5-4bb7-4192-9107-fc72f938be68
+
+UltimatePhonebook
+dir
+
+database
+dir
+
+facebook
+dir
+
+map
+dir
+
+twitter
+dir
+

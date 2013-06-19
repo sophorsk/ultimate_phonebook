@@ -1,0 +1,300 @@
+package edu.macalester.UltimatePhonebook;
+
+import edu.macalester.database.DbHelper;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.telephony.SmsManager;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+/**
+ * Sends a text message to the contact whose contact pane the user was in. 
+ * The user is given options on the number to text in cases where the
+ * contact has more than one number saved in the database. Otherwise the 
+ * user is prompted to enter a number
+ * 
+ * @author The Other Guys
+ *
+ */
+public class TextMessage extends Activity{
+	Button btnSendSMS;
+	Button btnDiscard;
+	EditText txtMessage;
+	Bundle bundle;
+	static String number;
+	static String message;
+	LinkedList<CharSequence> mobile_numbers;
+	DbHelper helper;
+	Long rowId = null;
+	
+	private final int MAX_SMS = 160;
+	
+	/**
+	 * Created when the activity is started
+	 */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		
+		this.bundle = savedInstanceState;
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.message);
+		
+		btnSendSMS = (Button) findViewById(R.id.sendSMS);
+		btnDiscard = (Button) findViewById(R.id.discard);
+		txtMessage = (EditText) findViewById(R.id.txtMessage);
+		
+		helper = new DbHelper(this);
+		
+		Bundle extras = getIntent().getExtras();
+		rowId = (bundle == null) ? null : (Long) bundle
+				.getSerializable(DbHelper.KEY_ROWID);
+		
+		if (extras != null) {
+			rowId = extras.getLong(DbHelper.KEY_ROWID);
+		}
+		
+		mobile_numbers = getNumbers();
+		
+		numberStatus();
+		
+		btnSendSMS.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				message = txtMessage.getText().toString();
+				
+				if (number.length() > 0 && message.length() > 0) {
+					sendSMS(number, message);
+					finish();
+				} else {
+					Toast.makeText(getBaseContext(), "Please enter" +
+							" message", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+		
+		btnDiscard.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
+		
+	}
+	
+	/**
+	 * Checks how many numbers the contact has:
+	 * 		Asks the user for a number if there are no saved numbers
+	 * 		Texts the number given if there is only one number
+	 * 		Allows the user to choose a number if there are two or more numbers
+	 */
+	private void numberStatus() {
+		switch(mobile_numbers.size()){
+		case 0: 
+			askForNumbers(); break;
+		case 1: 
+			number = (String) mobile_numbers.get(0); 
+			break;
+		case 2:
+			showOptions(); break;
+		}
+	}
+
+	/**
+	 * Displays an alert dialogue asking the user if they would like to add a 
+	 * number for a given contact
+	 * 		Goes to the contact editing screen if the user chooses to add a number
+	 * 		Cancels and goes back to the contact pane otherwise
+	 */
+	private void askForNumbers() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	builder.setTitle("This contact has no number. " +
+    			"Would you like to add one?");
+    	
+    	builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+           @Override
+		public void onClick(DialogInterface dialog, int id) {
+        	   Intent add_number = new Intent();
+        	   add_number.setClass(TextMessage.this, ContactEditor.class);
+        	   add_number.putExtra(DbHelper.KEY_ROWID, rowId);
+        	   add_number.putExtra(Code.REQUEST_CODE, Code.ADD_NUMBER);
+        	   startActivityForResult(add_number, Code.ADD_NUMBER);
+           }
+       }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+           @Override
+		public void onClick(DialogInterface dialog, int id) {
+               dialog.cancel();
+               finish();
+          }
+      });
+    	AlertDialog alert = builder.create();
+    	alert.show();
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+		super.onActivityResult(requestCode, resultCode, data);
+		if((requestCode == Code.ADD_NUMBER) && (resultCode == RESULT_OK)){
+			onCreate(bundle);
+		}
+	}
+		
+	/**
+	 * Sends a text message to the number selected by the user. 
+	 * 
+	 * @param phoneNumber - the contact's number
+	 * @param message - the message to be sent
+	 */
+	private void sendSMS(String phoneNumber, String message) {
+		
+		String SENT = "SMS_SENT";
+		String DELIVERED = "SMS_DELIVERED";
+		
+		PendingIntent sentPi = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
+		PendingIntent deliveredPi = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
+		
+		registerReceiver(new BroadcastReceiver() {
+			
+			@Override
+			public void onReceive(Context arg0, Intent arg1) {
+				TextMessage.this.setResult(getResultCode());
+//				switch (getResultCode()) {
+//					case Activity.RESULT_OK:
+//						Toast.makeText(getBaseContext(), "SMS sent", Toast.LENGTH_SHORT).show();
+//						break;
+//					case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+//						Toast.makeText(getBaseContext(), "Generic failure", Toast.LENGTH_SHORT).show();
+//						break;
+//					case SmsManager.RESULT_ERROR_NO_SERVICE:
+//						Toast.makeText(getBaseContext(), "No service", Toast.LENGTH_SHORT).show();
+//						break;
+//					case SmsManager.RESULT_ERROR_NULL_PDU:
+//						Toast.makeText(getBaseContext(), "Null PDU", Toast.LENGTH_SHORT).show();
+//						break;
+//					case SmsManager.RESULT_ERROR_RADIO_OFF:
+//						Toast.makeText(getBaseContext(), "Radio off", Toast.LENGTH_SHORT).show();
+//						break;
+//				}
+			}
+		},new IntentFilter(SENT));
+		
+		registerReceiver(new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context arg0, Intent arg1) {
+				switch (getResultCode()) {
+				case Activity.RESULT_OK:
+                    Toast.makeText(getBaseContext(), "SMS delivered", 
+                            Toast.LENGTH_SHORT).show();
+                    break;
+                case Activity.RESULT_CANCELED:
+                    Toast.makeText(getBaseContext(), "SMS not delivered", 
+                            Toast.LENGTH_SHORT).show();
+                    break; 
+				}
+			}
+		},new IntentFilter(DELIVERED));
+				
+		SmsManager sms = SmsManager.getDefault();
+		int length = message.length();
+		if(length > MAX_SMS) {
+			ArrayList<String> messageList = sms.divideMessage(message);
+			sms.sendMultipartTextMessage(phoneNumber, null, messageList, null, null);
+			finish();
+		} else {
+			sms.sendTextMessage(phoneNumber, null, message, sentPi, deliveredPi);
+			finish();
+		}
+	}
+	
+	/**
+	 * Searches the database for mobile number/s saved for the contact with id = rowId
+	 * 
+	 * @return LinkedList<CharSequence> with all the numbers saved for the contact
+	 */
+	private LinkedList<CharSequence> getNumbers() {
+		LinkedList<CharSequence> nums = new LinkedList<CharSequence>();
+		try{
+			Cursor num_cursor = helper.getAllNumbers(rowId);
+			startManagingCursor(num_cursor);
+			if(num_cursor.moveToFirst()){
+	    		do{
+	    			String mobile_1 = num_cursor.getString(num_cursor.getColumnIndexOrThrow(DbHelper.KEY_MOBILE_1));
+	    			String mobile_2 = num_cursor.getString(num_cursor.getColumnIndexOrThrow(DbHelper.KEY_MOBILE_2));
+	    			String[] mobile = {mobile_1, mobile_2};
+	    			
+	    			for(int i = 0; i < mobile.length; i++){
+	    				if(mobile[i].length() != 0){
+	    					nums.add(mobile[i]);
+	    				}
+	    			}
+	    			
+	    		}while(num_cursor.moveToNext());
+	    	}
+		}catch(NullPointerException e){
+			
+		}
+		return nums;
+	}
+
+	/**
+	 * Shows an alert dialogue with the number/s saved for the contact. It allows the 
+	 * user to choose the number they would like to send a message to and calls the 
+	 * method sendSMS passing it the number and message as parameters
+	 */
+	private void showOptions() {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	builder.setTitle("Choose Number");
+    	
+    	final CharSequence[] mobile_nums = toCharSequence();  	
+    	builder.setSingleChoiceItems(mobile_nums, -1, new DialogInterface.OnClickListener() {
+    	    @Override
+			public void onClick(DialogInterface dialog, int num) {
+    	        number = (String) mobile_nums[num];
+    	        Toast.makeText(getBaseContext(), number, Toast.LENGTH_SHORT).show();
+    	    }
+    	});
+    	builder.setCancelable(false);
+    	builder.setPositiveButton("Choose", new DialogInterface.OnClickListener() {
+           @Override
+		public void onClick(DialogInterface dialog, int id) {
+        	   
+           }
+       }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+           @Override
+		public void onClick(DialogInterface dialog, int id) {
+               dialog.cancel();
+               finish();
+          }
+      });
+    	AlertDialog alert = builder.create();
+    	alert.show();
+	}
+
+	/**
+	 * Converts the strings of numbers into character sequences 
+	 *  
+	 * @return an array of character sequences of the number associated with the contact 
+	 */
+	private CharSequence[] toCharSequence() {
+		CharSequence[] seq = new CharSequence[mobile_numbers.size()];
+		int i = 0;
+		for(CharSequence val : mobile_numbers){
+			seq[i] = val;
+			i++;
+		}
+		return seq;
+	}
+}		

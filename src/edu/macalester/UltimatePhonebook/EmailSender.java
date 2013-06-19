@@ -1,0 +1,192 @@
+package edu.macalester.UltimatePhonebook;
+
+import edu.macalester.database.DbHelper;
+import java.util.LinkedList;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
+
+/**
+ * This activity handles sending email to the people on the contact list.
+ * It will ask user to add an email if there is no email for the contact.
+ * It will ask user to choose which email to send if the contact has more
+ * than one emails. Then it will ask user which mailing application user
+ * wants to use. 
+ * @author sophorskhut
+ *
+ */
+public class EmailSender extends Activity{
+	
+	Cursor contact_cursor;
+	Long rowId;
+	DbHelper helper;
+	Bundle bundle;
+	ContactPane pane;
+	TextView name;
+	String fname;
+	String mailToSend;
+	LinkedList<CharSequence> all_emails = new LinkedList<CharSequence>();
+	
+	@Override
+	public void onCreate(Bundle bundle) {
+		this.bundle = bundle;
+		super.onCreate(bundle);
+		
+		helper = new DbHelper(this);
+		pane = new ContactPane();
+		
+		Bundle extras = getIntent().getExtras();
+		rowId = null;
+		
+		rowId = (bundle == null) ? null : (Long) bundle
+				.getSerializable(DbHelper.KEY_ROWID);
+		
+		if (extras != null) {
+			rowId = extras.getLong(DbHelper.KEY_ROWID);			
+		}
+
+		all_emails = getEmails();
+		
+		mailStatus();
+		
+	}
+	
+	private void mailStatus() {
+		switch(all_emails.size()){
+		case 0: 
+			askForEmails(); break;
+		case 1: 
+			mailToSend = (String) all_emails.get(0); 
+			sendMail(mailToSend);
+			break;
+		case 2:
+			showOptions(); break;
+		default :
+			showOptions(); break;
+		}
+	}
+	/**
+	 * ask to add email if there is no email.
+	 */
+	private void askForEmails() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	builder.setTitle("This contact has no email. " +
+    			"Would you like to add one?");
+    	
+    	builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+           @Override
+		public void onClick(DialogInterface dialog, int id) {
+        	   Intent add_email = new Intent();
+        	   add_email.setClass(EmailSender.this, ContactEditor.class);
+        	   add_email.putExtra(DbHelper.KEY_ROWID, rowId);
+        	   add_email.putExtra(Code.REQUEST_CODE, Code.ADD_EMAIL);
+        	   startActivityForResult(add_email, Code.ADD_EMAIL);
+           }
+       }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+           @Override
+		public void onClick(DialogInterface dialog, int id) {
+               dialog.cancel();
+               finish();
+          }
+      });
+    	AlertDialog alert = builder.create();
+    	alert.show();
+	}
+	/**
+	 * Put all emails in the linkedlist
+	 * @return
+	 */
+	private LinkedList<CharSequence> getEmails() {
+		LinkedList<CharSequence> mails = new LinkedList<CharSequence>();
+		Cursor num_cursor = helper.getAllEmails(rowId);
+		startManagingCursor(num_cursor);
+		if(num_cursor.moveToFirst()){
+    		do{
+    			String email_0 = num_cursor.getString(num_cursor.getColumnIndexOrThrow(DbHelper.KEY_EMAIL_1));
+    			String email_1 = num_cursor.getString(num_cursor.getColumnIndexOrThrow(DbHelper.KEY_EMAIL_2));
+    			String email_2 = num_cursor.getString(num_cursor.getColumnIndexOrThrow(DbHelper.KEY_EMAIL_3));
+    			String email_3 = num_cursor.getString(num_cursor.getColumnIndexOrThrow(DbHelper.KEY_EMAIL_4));
+    			String[] email = {email_0, email_1, email_2, email_3};
+    			for(int i = 0; i < email.length; i++){
+    				if(email[i].length() != 0){
+    					mails.add(email[i]);
+    				}
+    			}
+    			
+    		}while(num_cursor.moveToNext());
+    	}
+		return mails;
+	}
+	/**
+	 * show all the emails before sending.
+	 */
+	private void showOptions() {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	builder.setTitle("Choose Email");
+    	
+    	final CharSequence[] mobile_nums = toCharSequence();  	
+    	builder.setSingleChoiceItems(mobile_nums, -1, new DialogInterface.OnClickListener() {
+    	    @Override
+			public void onClick(DialogInterface dialog, int num) {
+    	    	mailToSend = (String) mobile_nums[num];
+    	    }
+    	});
+    	builder.setCancelable(false);
+    	builder.setPositiveButton("Choose", new DialogInterface.OnClickListener() {
+           @Override
+		public void onClick(DialogInterface dialog, int id) {
+        	   sendMail(mailToSend);
+           }
+       }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+           @Override
+		public void onClick(DialogInterface dialog, int id) {
+               dialog.cancel();
+               finish();
+          }
+      });
+    	AlertDialog alert = builder.create();
+    	alert.show();
+	}
+	
+	private CharSequence[] toCharSequence() {
+		CharSequence[] seq = new CharSequence[all_emails.size()];
+		int i = 0;
+		for(CharSequence val : all_emails){
+			seq[i] = val;
+			i++;
+		}
+		return seq;
+	}
+	/**
+	 * Call intent to send email including the subject of the email.
+	 * @param email
+	 */
+	private void sendMail(String email) {
+		
+        try {
+        	
+        	Uri uri = Uri.parse("mailto:"+ email);
+    	    Intent mail = new Intent(Intent.ACTION_SENDTO, uri);
+    	    mail.putExtra(Intent.EXTRA_SUBJECT, "Enter subject");
+    	    startActivity(mail);
+    	   
+        } catch (ActivityNotFoundException e) {
+            Log.e("", "Send failed", e);
+        }
+    }
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+		super.onActivityResult(requestCode, resultCode, data);
+		if((requestCode == Code.ADD_EMAIL) && (resultCode == RESULT_OK)){
+			onCreate(bundle);
+		}
+	}
+}

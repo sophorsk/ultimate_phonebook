@@ -1,0 +1,247 @@
+package edu.macalester.UltimatePhonebook;
+
+import edu.macalester.database.DbHelper;
+import java.util.ArrayList;
+import java.util.List;
+import android.app.Activity;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+/**
+ * This is the main activity for this application. It displays in a list 
+ * the contacts saved in the database and the user can select the contact they 
+ * want to interact with by simply clicking on that contact. 
+ * 
+ * @author The Other Guys
+ *
+ */
+public class UltimatePhonebook extends Activity {
+
+	public ListView lvPhone;
+	ArrayAdapter<CharSequence> spinner_adapter;
+	DbHelper adapter;
+	public List<PhoneBook> listPhoneBook;
+	PhoneBookAdapter phone_adapter;
+	Cursor cursor;
+	Long rowId;
+	ImageButton add;
+	ImageButton dialer;
+	Spinner order;
+	Bundle bundle;
+	long tempId = 10000000;
+
+	@Override
+	public void onCreate(Bundle bundle) {
+		this.bundle = bundle;
+		super.onCreate(bundle);
+		setContentView(R.layout.main);
+		lvPhone = (ListView) findViewById(R.id.listPhone);
+
+		listPhoneBook = new ArrayList<PhoneBook>();
+		
+		add = (ImageButton) findViewById(R.id.add);
+		dialer = (ImageButton) findViewById(R.id.dialer);
+		order = (Spinner) findViewById(R.id.order);
+
+		adapter = new DbHelper(this);
+
+		populateCL(DbHelper.DEFAULT_ORDER);
+		lvPhone.setOnItemClickListener(onListClick);
+
+		add.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View view) {
+				Intent add_intent = new Intent();
+				add_intent.setClass(UltimatePhonebook.this, ContactAdder.class);
+				startActivityForResult(add_intent, Code.CREATE_CONTACT);
+			}
+		});
+
+		spinner_adapter = ArrayAdapter.createFromResource(this,
+				R.array.order_type_array, android.R.layout.simple_spinner_item);
+		spinner_adapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		order.setAdapter(spinner_adapter);
+
+		order.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parentView,
+					View selectedItemView, int position, long id) {
+				String item = (String) parentView.getItemAtPosition(position);
+
+				if (item.toString().equals("Alphabetical")) {
+					DbHelper.setOrder(DbHelper.KEY_NAME + " COLLATE NOCASE");
+				}
+
+				else if (item.equals("Recent")) {
+					DbHelper.setOrder(DbHelper.KEY_LASTUSED + " DESC");
+				}
+
+				else if (item.toString().equals("Frequent")) {
+					DbHelper.setOrder(DbHelper.KEY_TIMESUSED + " DESC");
+				}
+
+				else if (item.toString().equals("Groups")) {
+					DbHelper.setOrder(DbHelper.KEY_GROUP + " COLLATE NOCASE");
+				}
+				refresh();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parentView) {
+
+			}
+
+		});
+
+		dialer.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(Intent.ACTION_DIAL);
+				startActivity(intent);
+				finish();
+			}
+		});
+	}
+
+	/**
+	 * Acts on a contact responding to requests from other classes:
+	 * 		1. Creates a contact and then refreshes the list to display this new contact
+	 * 			when requested by the ContactAdder Activity
+	 * 		2. Deletes a contact that has been marked for deletion and refreshes
+	 * 			the contact list when requested by the Deletion Activity
+	 * 		3. Changes the displayed content of a contact after it has been edited 
+	 * 			 when requested by the ContactEditor Actitity 
+	 */
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if ((requestCode == Code.CREATE_CONTACT) && (resultCode == RESULT_OK)) {
+			Bundle extras = data.getExtras();
+			rowId = null;
+			if (extras != null) {
+				rowId = extras.getLong(DbHelper.KEY_ROWID);
+			}
+
+			Intent newContactIntent = new Intent();
+			newContactIntent
+					.setClass(UltimatePhonebook.this, ContactPane.class);
+			newContactIntent.putExtra(DbHelper.KEY_ROWID, rowId);
+			startActivity(newContactIntent);
+
+			refresh();
+		} else if ((requestCode == Code.VIEW_PANE) && (resultCode == Code.MARK_FOR_DELETION)) {
+			Bundle extras = data.getExtras();
+			if (extras != null) {
+				tempId = extras.getLong(DbHelper.KEY_ROWID);
+				adapter.delete(tempId);
+				refresh();
+			}
+		} else if ((requestCode == Code.VIEW_PANE) && (resultCode == Code.CONTACT_EDIT)) {
+			refresh();
+		}
+	}
+
+	/**
+	 * Populates the contact list with all the contacts that are in the database
+	 * 
+	 * @param order - the order the user would like to display the contacts in
+	 */
+	void populateCL(String order) {
+		cursor = adapter.getAll(order);
+		startManagingCursor(cursor);
+
+		if (cursor.moveToFirst()) {
+			do {
+				show(cursor);
+			} while (cursor.moveToNext());
+		}
+		phone_adapter = new PhoneBookAdapter(this, listPhoneBook);
+		lvPhone.setAdapter(phone_adapter);
+	}
+
+	/**
+	 * Helper function for selecting values from a cursor and passing them onto
+	 * a Phonebook object
+	 * 
+	 * @param cursor - a cursor holding a contact's information
+	 */
+	private void show(Cursor cursor) {
+		this.cursor = cursor;
+		if (tempId == cursor.getLong(cursor.getColumnIndex(DbHelper.KEY_ROWID))) {
+
+		} else {
+			listPhoneBook.add(new PhoneBook(BitmapFactory.decodeResource(
+					getResources(), R.drawable.place_holder), cursor
+					.getString(cursor.getColumnIndex(DbHelper.KEY_NAME)),
+					cursor.getString(cursor
+							.getColumnIndex(DbHelper.KEY_MOBILE_1)), cursor
+							.getString(cursor
+									.getColumnIndex(DbHelper.KEY_GROUP))));
+		}
+	}
+
+	/**
+	 * Displays the selected contact 
+	 */
+	private AdapterView.OnItemClickListener onListClick = new AdapterView.OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			cursor.moveToPosition(position);
+			rowId = cursor.getLong(cursor
+					.getColumnIndexOrThrow(DbHelper.KEY_ROWID));
+
+			useStats();
+
+			Intent intent = new Intent();
+			intent.setClass(UltimatePhonebook.this, ContactPane.class);
+			intent.putExtra(DbHelper.KEY_ROWID, rowId);
+			startActivityForResult(intent,Code.VIEW_PANE);
+		}
+	};
+
+	/**
+	 * Refreshes the list displayed by the contact list to reflect changes that have 
+	 * been made to the contact list
+	 */
+	void refresh() {
+		listPhoneBook.clear();
+		((BaseAdapter) lvPhone.getAdapter()).notifyDataSetChanged();
+		populateCL(DbHelper.getOrder());
+	}
+	
+	/**
+	 * Updates the frequency and the last use date of a contact
+	 */
+	void useStats() {
+		Cursor freq_cursor = adapter.getFreq(rowId);
+		int times_used = 0;
+		startManagingCursor(freq_cursor);
+
+		if (freq_cursor.moveToFirst()) {
+			do {
+				times_used = Integer.parseInt(freq_cursor.getString(freq_cursor
+						.getColumnIndex(DbHelper.KEY_TIMESUSED)));
+			} while (freq_cursor.moveToNext());
+		}
+		freq_cursor.close();
+		times_used++;
+		adapter.updateFreq(rowId, times_used);
+	}
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="1">     
+    <EditText 
+        android:id="@+id/txtMessage"  
+        android:layout_width="fill_parent" 
+        android:layout_height="150px"
+        android:gravity="top" android:layout_weight="0.12"/>
+    <LinearLayout android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/linearLayout2">
+        <Button android:text="Send SMS" android:layout_width="150dp" android:layout_height="wrap_content" android:id="@+id/sendSMS"></Button>
+        <Button android:text="Discard" android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/discard"></Button>
+    </LinearLayout>    
+</LinearLayout>

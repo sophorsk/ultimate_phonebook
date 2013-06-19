@@ -1,0 +1,242 @@
+package edu.macalester.map;
+
+import edu.macalester.UltimatePhonebook.Code;
+import edu.macalester.UltimatePhonebook.ContactEditor;
+import edu.macalester.UltimatePhonebook.R;
+import edu.macalester.database.DbHelper;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+/**
+ * This activity handles getting maps and directions for a stored address for a contact.
+ * All maps and directions accessed through Google Maps through the web browser.
+ * This activity uses the GPS, but will turn it off if it is exited or when it starts another activity.
+ * 
+ * @author Matt Lesicko
+ *
+ */
+public class Directions extends Activity{
+	
+	Bundle bundle;
+	DbHelper helper;
+	Long rowId;
+	String url;
+	String address;
+	Button gps;
+	Button directions;
+	Button mapView;
+	TextView destination;
+	EditText location;
+	LocationManager locMan;
+	String provider;
+	Location lastKnown;
+	Cursor contact_cursor;
+	
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		this.bundle = savedInstanceState;
+		super.onCreate(bundle);
+		setContentView(R.layout.map);
+		
+		helper = new DbHelper(this);
+		url="http://www.google.com/maps?";
+		gps = (Button) findViewById(R.id.gps);
+		directions = (Button) findViewById(R.id.directions);
+		mapView = (Button) findViewById (R.id.mapView);
+		destination = (TextView) findViewById (R.id.destination);
+		location = (EditText) findViewById (R.id.location);
+		
+		//turn on GPS
+		locMan = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		lastKnown=null; //stores the last known location.
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_FINE);
+		criteria.setAltitudeRequired(false);
+		criteria.setBearingRequired(false);
+		criteria.setCostAllowed(true);
+		criteria.setPowerRequirement(Criteria.POWER_LOW);
+		provider = locMan.getBestProvider(criteria, true);
+		locMan.requestLocationUpdates(provider, 0, 0, locationListener);
+		
+		Bundle extras = getIntent().getExtras();
+		rowId = null;
+		
+		rowId = (bundle == null) ? null : (Long) bundle
+				.getSerializable(DbHelper.KEY_ROWID);
+		if (extras != null) {
+			rowId = extras.getLong(DbHelper.KEY_ROWID);
+		}
+		
+		contact_cursor = helper.getContact(rowId);
+		address = DbHelper.getAddress(contact_cursor);
+		if (address.equals("")){
+			//If there is no address stored for the contact.
+			// Offer option to add address.
+			// If they add, open ContactEditor.
+			// Otherwise, end the activity.
+			askForAddress();
+		}
+		
+		destination.setText(address);
+		gps.setOnClickListener(onClick);
+		directions.setOnClickListener(onClick);
+		mapView.setOnClickListener(onClick);
+	}
+	
+	/**
+	 * Turns off the GPS when the program exits.
+	 */
+	@Override
+	public void onDestroy(){
+		locMan.removeUpdates(locationListener);
+		super.onDestroy();
+	}
+	
+	private void askForAddress() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	builder.setTitle("This contact has no address. " +
+    			"Would you like to add one?");
+    	
+    	builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+           @Override
+		public void onClick(DialogInterface dialog, int id) {
+        	   Intent add_number = new Intent();
+        	   add_number.setClass(Directions.this, ContactEditor.class);
+        	   add_number.putExtra(DbHelper.KEY_ROWID, rowId);
+        	   add_number.putExtra(Code.REQUEST_CODE, Code.ADD_ADDRESS);
+        	   startActivityForResult(add_number, Code.ADD_ADDRESS);
+           }
+       }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+           @Override
+		public void onClick(DialogInterface dialog, int id) {
+               dialog.cancel();
+               finish();
+          }
+      });
+    	AlertDialog alert = builder.create();
+    	alert.show();
+	}
+	
+
+	private View.OnClickListener onClick = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+						
+			switch(v.getId()){
+				//user chooses to get directions from current location.
+				case R.id.gps:
+					GpsDirections();
+					break;
+				//user chooses to get directions from location entered in the textbox
+				case R.id.directions:
+					String start=location.getText().toString();
+					if (start.length()==0){
+						Toast.makeText( getApplicationContext(),"You haven't entered a start location!",Toast.LENGTH_SHORT ).show();
+					}
+					else{
+						Direction(start);
+					}
+					break;
+				//user chooses to view the contact's address on a map
+				case R.id.mapView:
+					ShowOnMap();
+					break;
+			}
+		}
+	};
+	
+	/**
+	 * Gets the current location from the GPS. If no location information is available, tells this to the user.
+	 * Otherwise calls Direction with this as the start location.
+	 */
+	private void GpsDirections(){
+		if (lastKnown != null){
+			Direction(lastKnown);
+		}
+		else if (locMan.getLastKnownLocation(provider)!=null){
+			Direction(locMan.getLastKnownLocation(provider));
+		}
+		else{
+			Toast.makeText( getApplicationContext(),"No GPS information avaliable from "+provider,Toast.LENGTH_SHORT ).show();
+		}
+	}
+	
+	/**
+	 * Shows the contact's stored address on a map by opening Google Maps in the browser.
+	 * Stops using the GPS.
+	 */
+	private void ShowOnMap(){
+		Intent i = new Intent(Intent.ACTION_VIEW, 
+			       Uri.parse(url+"q="+address));
+		locMan.removeUpdates(locationListener);
+		startActivity(i);
+		
+
+	}
+	
+	/**
+	 * Opens Google Maps in the web browser to get directions from a starting location to
+	 * the location stored for the contact.
+	 * Stops using the GPS.
+	 * @param start the location to get directions from.
+	 */
+	private void Direction(String start){
+		Intent i = new Intent(Intent.ACTION_VIEW,
+					Uri.parse(url+"saddr="+start+"&daddr="+address));
+		locMan.removeUpdates(locationListener);
+		startActivity(i);
+	}
+	
+	/**
+	 * Calls Direction with a Location object instead of a string.
+	 * @param loc the starting location, as a Location.
+	 */
+	private void Direction(Location loc){
+		Direction(loc.getLatitude()+","+loc.getLongitude());
+	}
+	
+	/**
+	 * Gets changes in location from the GPS. Stores the to a Location variable to be accessed later.
+	 */
+	private final LocationListener locationListener = new LocationListener() {
+		  @Override
+		public void onLocationChanged(Location location) {
+		    lastKnown=location;
+		  }
+
+		  @Override
+		public void onProviderDisabled(String provider){
+			  Toast.makeText( getApplicationContext(),"GPS Disabled",Toast.LENGTH_SHORT ).show();
+		  }
+		  @Override
+		public void onProviderEnabled(String provider){
+			  Toast.makeText( getApplicationContext(),"GPS Enabled",Toast.LENGTH_SHORT ).show();
+		  }
+		  @Override
+		public void onStatusChanged(String provider, int status, Bundle extras) {}
+		};
+		
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+			super.onActivityResult(requestCode, resultCode, data);
+			if((requestCode == Code.ADD_ADDRESS) && (resultCode == RESULT_OK)){
+				onCreate(bundle);
+		}
+	}
+}

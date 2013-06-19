@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/comp225f11/!svn/ver/530/otherguys/UltimatePhonebookv2/src/edu/macalester/twitter
+END
+PrepareRequestTokenActivity.java
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/svn/comp225f11/!svn/ver/447/otherguys/UltimatePhonebookv2/src/edu/macalester/twitter/PrepareRequestTokenActivity.java
+END
+Constants.java
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/comp225f11/!svn/ver/530/otherguys/UltimatePhonebookv2/src/edu/macalester/twitter/Constants.java
+END
+TwitterUtils.java
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/comp225f11/!svn/ver/530/otherguys/UltimatePhonebookv2/src/edu/macalester/twitter/TwitterUtils.java
+END
+TwitterAdd.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/comp225f11/!svn/ver/448/otherguys/UltimatePhonebookv2/src/edu/macalester/twitter/TwitterAdd.java
+END
+TweetItemAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/comp225f11/!svn/ver/530/otherguys/UltimatePhonebookv2/src/edu/macalester/twitter/TweetItemAdapter.java
+END
+OAuthRequestTokenTask.java
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svn/comp225f11/!svn/ver/447/otherguys/UltimatePhonebookv2/src/edu/macalester/twitter/OAuthRequestTokenTask.java
+END
+TwitterStatus.java
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/comp225f11/!svn/ver/530/otherguys/UltimatePhonebookv2/src/edu/macalester/twitter/TwitterStatus.java
+END
+TweetReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/comp225f11/!svn/ver/530/otherguys/UltimatePhonebookv2/src/edu/macalester/twitter/TweetReader.java
+END
+Twitter.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/comp225f11/!svn/ver/530/otherguys/UltimatePhonebookv2/src/edu/macalester/twitter/Twitter.java
+END
+Tweet.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/comp225f11/!svn/ver/530/otherguys/UltimatePhonebookv2/src/edu/macalester/twitter/Tweet.java
+END

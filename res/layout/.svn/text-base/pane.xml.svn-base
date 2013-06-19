@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+    <RelativeLayout android:layout_width="match_parent" android:id="@+id/relativeLayout1" android:layout_height="match_parent">
+        <TableLayout android:id="@+id/tableLayout1" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true" android:layout_marginBottom="27dp">
+            <TableRow android:id="@+id/tableRow1" android:layout_height="wrap_content" android:layout_width="wrap_content">
+                <ImageButton android:id="@+id/call" android:layout_height="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/call" android:layout_width="wrap_content"></ImageButton>
+                <ImageButton android:id="@+id/text" android:layout_height="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/text" android:layout_width="wrap_content"></ImageButton>
+                <ImageButton android:layout_height="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/facebook" android:layout_width="wrap_content" android:id="@+id/facebook"></ImageButton>
+            </TableRow>
+            <TableRow android:id="@+id/tableRow2" android:layout_height="wrap_content" android:layout_width="wrap_content">
+                <TextView android:text="@string/call" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content" android:layout_gravity="center"></TextView>
+                <TextView android:text="@string/text" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content" android:layout_gravity="center"></TextView>
+                <TextView android:text="@string/facebook" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content" android:layout_gravity="center"></TextView>
+            </TableRow>
+            <TableRow android:id="@+id/tableRow3" android:layout_height="wrap_content" android:layout_width="wrap_content">
+                <ImageButton android:id="@+id/email" android:layout_height="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/email" android:layout_width="wrap_content"></ImageButton>
+                <ImageButton android:id="@+id/twitter" android:layout_height="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/twitter" android:layout_width="wrap_content"></ImageButton>
+                <ImageButton android:id="@+id/map" android:layout_height="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/map" android:layout_width="wrap_content"></ImageButton>
+            </TableRow>
+            <TableRow android:id="@+id/tableRow4" android:layout_height="wrap_content" android:layout_width="wrap_content">
+                <TextView android:text="@string/email" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content" android:layout_gravity="center"></TextView>
+                <TextView android:text="@string/twitter" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content" android:layout_gravity="center"></TextView>
+                <TextView android:text="@string/directions" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content" android:layout_gravity="center"></TextView>
+            </TableRow>
+            <TableRow android:id="@+id/tableRow5" android:layout_height="wrap_content" android:layout_width="wrap_content">
+                <ImageButton android:id="@+id/edit" android:layout_height="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/edit" android:layout_width="wrap_content"></ImageButton>
+                <ImageButton android:id="@+id/delete" android:layout_height="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/delete" android:layout_width="wrap_content"></ImageButton>
+                <ImageButton android:id="@+id/exit" android:layout_height="wrap_content" android:background="@drawable/buttonbg" android:src="@drawable/exit" android:layout_width="wrap_content"></ImageButton>
+            </TableRow>
+            <TableRow android:id="@+id/tableRow6" android:layout_height="wrap_content" android:layout_width="wrap_content">
+                <TextView android:text="@string/edit_button" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content" android:layout_gravity="center"></TextView>
+                <TextView android:text="@string/justdelete" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content" android:layout_gravity="center"></TextView>
+                <TextView android:text="@string/back" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_height="wrap_content" android:layout_gravity="center"></TextView>
+            </TableRow>
+        </TableLayout>
+        <ImageView android:layout_height="wrap_content" android:layout_width="wrap_content" android:src="@drawable/place_holder" android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:layout_marginTop="14dp" android:id="@+id/picture"></ImageView>
+        <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="wrap_content" android:text="TextView" android:layout_height="wrap_content" android:layout_above="@+id/tableLayout1" android:layout_centerHorizontal="true" android:layout_marginBottom="23dp" android:id="@+id/name"></TextView>
+    </RelativeLayout>
+    
+</LinearLayout>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+    <LinearLayout android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/callLinearLayout" android:orientation="vertical">
+        <QuickContactBadge android:id="@+id/quickContactBadge1" android:layout_gravity="center" android:layout_height="wrap_content" android:layout_width="wrap_content"></QuickContactBadge>
+        <LinearLayout android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/linearLayout2" android:orientation="vertical">
+            <TextView android:layout_height="wrap_content" android:id="@+id/callTextView" android:text="TextView" android:layout_gravity="center" android:layout_width="wrap_content"></TextView>
+        </LinearLayout>
+    </LinearLayout>
+    
+</LinearLayout>

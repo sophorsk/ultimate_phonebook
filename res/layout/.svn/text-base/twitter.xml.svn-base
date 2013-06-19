@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent" >
+    
+    <LinearLayout android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/linearLayout3" android:orientation="vertical" android:layout_gravity="center">
+       	<TextView android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_gravity="center" android:text="@string/welcome_twitter" android:layout_height="40dp" android:id="@+id/welcome_twitter"></TextView>
+        <Button android:layout_width="214dp" android:layout_height="wrap_content" android:layout_gravity="center" android:text="@string/update_twitter" android:id="@+id/update_twitter"></Button>
+        <LinearLayout android:orientation="vertical" android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/linearLayout1" android:layout_gravity="center">
+            <Button android:layout_width="213dp" android:layout_height="wrap_content" android:layout_gravity="center" android:text="@string/view_twitter" android:id="@+id/view_twitter"></Button>
+        </LinearLayout>
+    </LinearLayout>
+	<LinearLayout android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/linearLayout2" android:orientation="vertical" android:layout_gravity="center">
+        <Button android:layout_height="wrap_content" android:layout_width="214dp" android:layout_gravity="center" android:text="@string/add_twitter" android:id="@+id/add_twitter"></Button>
+    </LinearLayout>
+	
+	
+</LinearLayout>	
+

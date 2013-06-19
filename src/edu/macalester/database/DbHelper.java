@@ -1,0 +1,451 @@
+package edu.macalester.database;
+
+import java.sql.Timestamp;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
+import android.util.Log;
+
+/**
+ * Creates a database and tables within the database. It has 
+ * helper functions that are used by other activities to 
+ * interact with the database.
+ * 
+ * @author The Other Guys
+ *
+ */
+public class DbHelper extends SQLiteOpenHelper {
+
+	/**
+	 * Database fundamentals
+	 */
+	public static final String DATABASE_NAME = "ContactList.db";
+	private static final int SCHEMA_VERSION = 2;
+	public static final String DB_TABLE = "contact";
+	public static final String FB_TABLE = "facebook_info";
+	public static final String NAME_TABLE = "name_info";
+	public static final String TWITTER_TABLE = "twitter_info";
+	public static String order = "";
+
+	/**
+	 * Table column names
+	 */
+	public static final String KEY_ROWID = "_id";
+	public static final String KEY_NAME = "Full_Name";
+	public static final String KEY_MOBILE_1 = "Mobile_1";
+	public static final String KEY_MOBILE_2 = "Mobile_2";
+	public static final String KEY_HOMENUMBER = "Home_Number";
+	public static final String KEY_EMAIL_1 = "Email_1";
+	public static final String KEY_EMAIL_2 = "Email_2";
+	public static final String KEY_EMAIL_3 = "Email_3";
+	public static final String KEY_EMAIL_4 = "Email_4";
+	public static final String KEY_GROUP = "User_Group";
+	public static final String KEY_STREET_1 = "first_street";
+	public static final String KEY_STREET_2 = "second_street";
+	public static final String KEY_CITY = "city";
+	public static final String KEY_STATE = "state";
+	public static final String KEY_COUNTRY = "country";
+	public static final String KEY_ZIP = "zip";
+
+	public static final String KEY_LASTUSED = "Last_Used";
+	public static final String KEY_TIMESUSED = "Times_Used";
+	
+	public static final String KEY_FACEBOOKID = "facebook_id";
+	public static final String KEY_TWITTER_NAME = "twitter_name";
+	
+	public static String DEFAULT_ORDER = KEY_NAME + " COLLATE NOCASE";
+	
+	static SQLiteDatabase database;
+	Context context;
+
+	/**
+	 * A SQL used to make the table of the database
+	 */
+	private static final String DB_CREATE = "CREATE TABLE contact(_id INTEGER PRIMARY KEY AUTOINCREMENT, Full_Name TEXT, Mobile_1 TEXT, Mobile_2 TEXT, " +
+			"Home_Number TEXT, Email_1 TEXT, Email_2 TEXT, Email_3 TEXT, Email_4 TEXT, User_Group TEXT, first_street TEXT, second_street TEXT, city TEXT, " +
+			"state TEXT, country TEXT, zip TEXT, facebook_id TEXT, twitter_name TEXT, Last_Used TEXT, Times_Used INTEGER);";
+	
+	private static final String FB_CREATE = "CREATE TABLE facebook_info(_id INTEGER, facebook_id TEXT);";
+	private static final String NAME_CREATE = "CREATE TABLE name_info(_id INTEGER, Full_Name TEXT);";
+	private static final String TWITTER_CREATE = "CREATE TABLE twitter_info(_id INTEGER, twitter_name TEXT);";
+	
+	@Override
+	public void onCreate(SQLiteDatabase database) {
+		DbHelper.database = database;
+		database.execSQL(DB_CREATE);
+		database.execSQL(FB_CREATE);
+		database.execSQL(NAME_CREATE);
+		database.execSQL(TWITTER_CREATE);
+	}
+
+	@Override
+	public void onUpgrade(SQLiteDatabase database, int oldVersion,
+			int newVersion) {
+		Log.w(DbHelper.class.getName(), "Upgrading database from version "
+				+ oldVersion + " to " + newVersion
+				+ ", which will destroy all old data.");
+		database.execSQL("DROP TABLE IF EXISTS contact");
+		database.execSQL("DROP TABLE IF EXISTS facebook_info");
+		database.execSQL("DROP TABLE IF EXISTS name_info");
+		database.execSQL("DROP TABLE IF EXISTS twitter_info");
+		onCreate(database);
+
+	}
+
+	public DbHelper(Context context) {
+		super(context, DATABASE_NAME, null, SCHEMA_VERSION);
+	}
+
+	/**
+	 * Removes from the database the contact identified by the primary key id
+	 * 
+	 * @param id - the identifying primary key of the contact
+	 * 
+	 * @return true if contact has been deleted and false otherwise
+	 */
+	public boolean delete(Long id) {
+		return getWritableDatabase().delete(DB_TABLE, KEY_ROWID + "=" + id,
+				null) > 0;
+	}
+
+	/**
+	 * Adds a new contact with the information passed in the parameters below
+	 * 
+	 * @param name - The full name of the contact, cannot be null
+	 * @param group - The group the contact is in
+	 * @param number - An array of the numbers associated with the contact. 
+	 * 					There are three numbers per contact
+	 * @param email - An array of the email addresses associated with the contact. 
+	 * 					There are four emails per contact.
+	 * @param address - The contact's postal address
+	 * @param facebookId - The contact's facebook id.
+	 * @param twitterName - The contact's twitter name
+	 * 
+	 * @return id - The new contact's id
+	 */
+	public Long createContact(String name, String group, String[] number,
+			String[] email, String[] address, String facebookId, String twitterName) {
+		ContentValues cv = createContactValues(name, group, number, email,
+				address, facebookId, twitterName);
+		
+		cv.put(KEY_TIMESUSED, 0);
+		Timestamp time = new Timestamp(System.currentTimeMillis());
+		cv.put(KEY_LASTUSED, time.toString());
+
+		return getWritableDatabase().insert(DB_TABLE, null, cv);
+	}
+	
+	/**
+	 * Gets all the contacts in the database
+	 * 
+	 * @param order - The order in which the contacts should be returned in
+	 * @return a cursor containing all the contacts if there are any
+	 */
+	public Cursor getAll(String order) {
+		return (getReadableDatabase().query(DB_TABLE, new String[] { KEY_ROWID,
+				KEY_NAME, KEY_MOBILE_1, KEY_GROUP }, null, null, null, null, order));
+	}
+
+	/**
+	 * Updates a contact's information with the information passed in the parameters below
+	 * 
+	 * @param name - The full name of the contact, cannot be null
+	 * @param group - The group the contact is in
+	 * @param number - An array of the numbers associated with the contact. 
+	 * 					There are three numbers per contact
+	 * @param email - An array of the email addresses associated with the contact. 
+	 * 					There are four emails per contact.
+	 * @param address - The contact's postal address
+	 * @param facebookId - The contact's facebook id.
+	 * @param twitterName - The contact's twitter name
+	 * 
+	 * @return true if the contact has been updated and false otherwise
+	 */
+	public boolean updateContact(long id, String name, String group,
+			String[] number, String[] email, String[] address, String facebookId, String twitterName) {
+		ContentValues updateValues = createContactValues(name, group, number,
+				email, address, facebookId, twitterName);
+		return getWritableDatabase().update(DB_TABLE, updateValues,
+				KEY_ROWID + "=" + id, null) > 0;
+	}
+
+	/**
+	 * Gets the number of times a contact's contact pane has been visited
+	 * 
+	 * @param id - The identifying prymary key of the contact in question
+	 * @return a cursor containing the number of times a contact has been used
+	 */
+	public Cursor getFreq(Long id) {
+		return getReadableDatabase().query(DB_TABLE, new String[] { KEY_TIMESUSED }, KEY_ROWID + "=" + id, 
+				null, null, null, null);
+	}
+	
+	/**
+	 * Updates the number of times a contact's pane has been visited
+	 * 
+	 * @param id - The identifying prymary key of the contact in question
+	 * @param times_used - The number of times the contact's pane has been visited
+	 * @return true if the contact's use frequency has been updated and false otherwise
+	 */
+	public boolean updateFreq(long id, int times_used){
+		ContentValues cv = new ContentValues();
+		
+		Timestamp time = new Timestamp(System.currentTimeMillis());
+		cv.put(KEY_TIMESUSED, times_used);
+		cv.put(KEY_LASTUSED, time.toString());
+		
+		return getWritableDatabase().update(DB_TABLE, cv,
+				KEY_ROWID + "=" + id, null) > 0;
+	}
+
+	/**
+	 * creates the content values of the contact being created or updated
+	 * 
+	 * @param name - The full name of the contact, cannot be null
+	 * @param group - The group the contact is in
+	 * @param number - An array of the numbers associated with the contact. 
+	 * 					There are three numbers per contact
+	 * @param email - An array of the email addresses associated with the contact. 
+	 * 					There are four emails per contact.
+	 * @param address - The contact's postal address
+	 * @param facebookId - The contact's facebook id.
+	 * @param twitterName - The contact's twitter name
+	 * 
+	 * @return cv - the content values
+	 */
+	private ContentValues createContactValues(String name, String group,
+			String[] number, String[] email, String[] address, String facebookId, String twitterName) {
+		ContentValues cv = new ContentValues();
+
+		cv.put(KEY_NAME, name);
+		cv.put(KEY_GROUP, group);
+
+		cv.put(KEY_MOBILE_1, number[0]);
+		cv.put(KEY_MOBILE_2, number[1]);
+		cv.put(KEY_HOMENUMBER, number[2]);
+
+		cv.put(KEY_EMAIL_1, email[0]);
+		cv.put(KEY_EMAIL_2, email[1]);
+		cv.put(KEY_EMAIL_3, email[2]);
+		cv.put(KEY_EMAIL_4, email[3]);
+
+		cv.put(KEY_STREET_1, address[0]);
+		cv.put(KEY_STREET_2, address[1]);
+		cv.put(KEY_CITY, address[2]);
+		cv.put(KEY_STATE, address[3]);
+		cv.put(KEY_COUNTRY, address[4]);
+		cv.put(KEY_ZIP, address[5]);
+		
+		cv.put(KEY_FACEBOOKID, facebookId);
+		cv.put(KEY_TWITTER_NAME, twitterName);
+		
+		Timestamp time = new Timestamp(System.currentTimeMillis());
+		cv.put(KEY_TIMESUSED, 1);
+		cv.put(KEY_LASTUSED, time.toString());
+		
+		return cv;
+	}
+	
+	/**
+	 * Adds a facebook id to an already created contact
+	 * 
+	 * @param id the identifying primary key of the contact
+	 * @param fb_id the unique facebook id of the contact
+	 * 
+	 * @return true if the facebook id has been added and false otherwise
+	 * 
+	 * @throws SQLException incase the contact does not exist
+	 */
+	public boolean newFBContact(Long id, String fb_id) throws SQLException {
+		ContentValues cv = new ContentValues();
+		
+		cv.put(KEY_ROWID, id);
+		cv.put(KEY_FACEBOOKID, fb_id);
+		
+		return getWritableDatabase().update(FB_TABLE, cv,
+				KEY_ROWID + "=" + id, null) > 0;
+	}
+	
+	public boolean nameContact(Long id, String name) throws SQLException {
+		ContentValues cv = new ContentValues();
+		
+		cv.put(KEY_ROWID, id);
+		cv.put(KEY_NAME, name);
+		
+		return getWritableDatabase().update(NAME_TABLE, cv,
+				KEY_ROWID + "=" + id, null) > 0;
+	}
+	
+	public boolean newTwitterContact(Long id, String twitterName) throws SQLException {
+		ContentValues cv = new ContentValues();
+		
+		cv.put(KEY_ROWID, id);
+		cv.put(KEY_TWITTER_NAME, twitterName);
+		
+		return getWritableDatabase().update(TWITTER_TABLE, cv,
+				KEY_ROWID + "=" + id, null) > 0;
+	}
+
+	/**
+	 * Gets the information of the contact with the given id
+	 * 
+	 * @param id - the identifying primary key of the contact
+	 * @return a cursor holding the contact's informartion
+	 * @throws SQLException incase the contact does not exist
+	 */
+	public Cursor getContact(long id) throws SQLException {
+		Cursor cursor = getReadableDatabase().query(
+				DB_TABLE,
+				new String[] { KEY_NAME, KEY_GROUP, KEY_MOBILE_1, KEY_MOBILE_2,
+						KEY_HOMENUMBER, KEY_EMAIL_1, KEY_EMAIL_2, KEY_EMAIL_3,
+						KEY_EMAIL_4, KEY_STREET_1, KEY_STREET_2, KEY_CITY,
+						KEY_STATE, KEY_COUNTRY, KEY_ZIP, KEY_FACEBOOKID, KEY_TWITTER_NAME},
+						KEY_ROWID + "=" + id, null, null, null, null);
+
+		if (cursor != null) {
+			cursor.moveToFirst();
+		}
+		return cursor;
+	}
+	
+	
+	public Cursor getNameInfor(long id) throws SQLException {
+		Cursor cursor = getReadableDatabase().query(
+				DB_TABLE,
+				new String[] {KEY_NAME},
+						KEY_ROWID + "=" + id, null, null, null, null);
+
+		if (cursor != null) {
+			cursor.moveToFirst();
+		}
+		return cursor;
+	}
+	
+	public Cursor getFacebookInfo(long id) throws SQLException {
+		Cursor cursor = getReadableDatabase().query(
+				DB_TABLE,
+				new String[] {KEY_FACEBOOKID},
+						KEY_ROWID + "=" + id, null, null, null, null);
+
+		if (cursor != null) {
+			cursor.moveToFirst();
+		}
+		return cursor;
+	}
+	
+	public Cursor getTwitterInfo(long id) throws SQLException {
+		Cursor cursor = getReadableDatabase().query(
+				DB_TABLE,
+				new String[] {KEY_TWITTER_NAME},
+						KEY_ROWID + "=" + id, null, null, null, null);
+
+		if (cursor != null) {
+			cursor.moveToFirst();
+		}
+		return cursor;
+	}
+	
+	/**
+	 * Gets the groups for all the contacts in the database
+	 * 
+	 * @return cursor - a cursor holding the unique groups for this contact
+	 */
+	public Cursor getGroups(){
+		String sql = SQLiteQueryBuilder.buildQueryString(true, DB_TABLE, new String[] {KEY_GROUP} , null, null, null, null, null);
+		Cursor cursor = getReadableDatabase().rawQuery(sql, null);
+		return cursor;
+	}
+	
+	/**
+	 * Gets all the email addresses for this contact
+	 * 
+	 * @param id - the identifying primary key of the contact
+	 * @return cursor - a cursor containing the contact's email addresses
+	 */
+	public Cursor getAllEmails(long id) {
+		Cursor cursor = getReadableDatabase().query(
+				DB_TABLE,
+				new String[] { KEY_EMAIL_1, KEY_EMAIL_2, KEY_EMAIL_3, KEY_EMAIL_4 },
+						KEY_ROWID + "=" + id, null, null, null, null);
+
+		if (cursor != null) {
+			cursor.moveToFirst();
+		}
+		return cursor;
+	}
+	
+	/**
+	 * Gets all the numbers for this contact
+	 * @param id - the identifying primary key of the contact
+	 * @return cursor - a cursor holding the contact's phone numbers
+	 */
+	public Cursor getAllNumbers(long id){
+		Cursor cursor = getReadableDatabase().query(
+				DB_TABLE,
+				new String[] { KEY_MOBILE_1, KEY_MOBILE_2, KEY_HOMENUMBER },
+						KEY_ROWID + "=" + id, null, null, null, null);
+
+		if (cursor != null) {
+			cursor.moveToFirst();
+		}
+		return cursor;
+	}
+	
+	/**
+	 * Gets a contact's postal address given a cursor with all contact's postal address information  
+	 *  
+	 * @param c -  the cursor with the contact's postal address information
+	 * @return address - a string with the contact's address
+	 */
+	public static String getAddress(Cursor c){
+		String address = (c.getString(c.getColumnIndex(DbHelper.KEY_STREET_1))+" "+c.getString(c.getColumnIndex(DbHelper.KEY_STREET_2))+" "+c.getString(c.getColumnIndex(DbHelper.KEY_CITY))+" "+c.getString(c.getColumnIndex(DbHelper.KEY_STATE))+" "+c.getString(c.getColumnIndex(DbHelper.KEY_COUNTRY))+" "+c.getString(c.getColumnIndex(DbHelper.KEY_ZIP)));
+		if (address.equals("     ")) {
+			return "";
+		} else {
+			return address;
+		}
+	}
+
+	/**
+	 * Opens the database so other activities can use it. 
+	 * 
+	 * @return a writable database that activities can use 
+	 * @throws SQLException incase the database does not exist
+	 */
+	public DbHelper open() throws SQLException {
+		DbHelper helper = new DbHelper(context);
+		helper.getWritableDatabase();
+		return this;
+	}
+	
+	/**
+	 * Closes the database
+	 */
+	@Override
+	public void close() throws SQLException {
+		DbHelper helper = new DbHelper(context);
+		helper.close();
+	}
+	
+	/**
+	 * Gets the current contact list order
+	 * 
+	 *  @return order - the current order of the contact list
+	 */
+	public static String getOrder() {
+		return order;
+	}
+	
+	/**
+	 * Sets the order of the contact list to the order passed in as a parameter
+	 * 
+	 * @param order - the order we want to give to the contact list
+	 */
+	public static void setOrder(String order) {
+		DbHelper.order = order;
+	}
+}

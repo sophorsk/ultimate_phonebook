@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="1">
+    <RelativeLayout android:layout_width="match_parent" android:id="@+id/relativeLayout1" android:layout_height="wrap_content">
+        <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/TextView1" android:layout_alignParentTop="true" android:layout_marginTop="50dp" android:layout_centerHorizontal="true" android:textSize="25dp" android:text="@string/delete_option">
+        </TextView>
+        <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentTop="true" android:layout_alignLeft="@+id/TextView1" android:layout_marginTop="250dp" android:id="@+id/deleteYes" android:text="@string/delete_yes"></Button>
+        <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentTop="true" android:layout_alignRight="@+id/TextView1" android:layout_marginTop="250dp" android:id="@+id/deleteNo" android:text="@string/delete_no"></Button>
+    </RelativeLayout>
+</LinearLayout>
